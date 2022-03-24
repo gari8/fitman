@@ -2,6 +2,7 @@ package main
 
 func main() {
 	c := NewHttpClient()
-	cfg := NewConfig(c)
+	h := NewIoHandler()
+	cfg := NewConfig(c, h)
 	cfg.setup()
 }

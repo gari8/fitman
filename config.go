@@ -1,13 +1,13 @@
 package main
 
+//go:generate mockgen -source=$GOFILE -package=$GOPACKAGE -destination=./mock.go
+
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -23,7 +23,7 @@ refresh_token="%s"`
 
 type tokenInfo struct {
 	Kind         string `json:"kind"`
-	IdToken      string `json:"idToke"`
+	IdToken      string `json:"idToken"`
 	RefreshToken string `json:"refreshToken"`
 	ExpiresIn    string `json:"expiresIn"`
 	LocalId      string `json:"localId"`
@@ -37,30 +37,42 @@ type httpClient interface {
 	post(path string, value io.Reader, header map[string]string) ([]byte, error)
 }
 
+type ioHandler interface {
+	ReadFile(path string) ([]byte, error)
+	DecodeToml(data string, v *TomlSetting) (interface{}, error)
+	MakeDir(dirPath string) error
+	OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
+	Write(f *os.File, b []byte) (n int, err error)
+}
+
 type Config struct {
 	ApiKey       string `toml:"api_key"`
 	RefreshToken string `toml:"refresh_token"`
 	httpClient
+	ioHandler
 }
 
-func NewConfig(c httpClient) *Config {
+func NewConfig(c httpClient,
+	h ioHandler) *Config {
 	return &Config{
 		httpClient: c,
+		ioHandler:  h,
 	}
 }
 
 func (c Config) readConfig() (*Config, error) {
 	fullPath := basedir + "/" + configFile
-	content, err := ioutil.ReadFile(fullPath)
+	content, err := c.ioHandler.ReadFile(fullPath)
 	if err != nil {
 		return nil, err
 	}
 	var t TomlSetting
-	_, err = toml.Decode(string(content), &t)
+	_, err = c.ioHandler.DecodeToml(string(content), &t)
 	if err != nil {
 		return nil, err
 	}
 	t.Config.httpClient = c.httpClient
+	t.Config.ioHandler = c.ioHandler
 	return &t.Config, nil
 }
 
@@ -82,13 +94,11 @@ func (c *Config) refresh() ([]byte, error) {
 func (c *Config) setConfigFile() ([]byte, error) {
 	fullPath := basedir + "/" + configFile
 
-	if _, err := os.Stat(basedir); os.IsNotExist(err) {
-		if err := os.Mkdir(basedir, 0777); err != nil {
-			return nil, err
-		}
+	if err := c.ioHandler.MakeDir(basedir); err != nil {
+		return nil, err
 	}
 
-	f, err := os.OpenFile(fullPath, os.O_RDWR|os.O_CREATE, 0666)
+	f, err := c.ioHandler.OpenFile(fullPath, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +121,7 @@ func (c *Config) setConfigFile() ([]byte, error) {
 
 	c.RefreshToken = info.RefreshToken
 
-	if _, err := f.Write([]byte(fmt.Sprintf(fileContentFormat,
+	if _, err := c.ioHandler.Write(f, []byte(fmt.Sprintf(fileContentFormat,
 		c.ApiKey, c.RefreshToken))); err != nil {
 		return nil, err
 	}
