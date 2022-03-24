@@ -1,0 +1,24 @@
+name: push all branch
+on:
+  push
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.18
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.18
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Get dependencies
+        run: go mod download
+
+      - name: Formatting
+        run: go fmt ./...
+      - name: Test code
+        run: go test -v ./...
