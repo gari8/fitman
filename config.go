@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"io"
 	"io/ioutil"
 	"os"
 )
@@ -32,13 +33,20 @@ type TomlSetting struct {
 	Config `toml:"default"`
 }
 
+type httpClient interface {
+	post(path string, value io.Reader, header map[string]string) ([]byte, error)
+}
+
 type Config struct {
 	ApiKey       string `toml:"api_key"`
 	RefreshToken string `toml:"refresh_token"`
+	httpClient
 }
 
-func NewConfig() *Config {
-	return &Config{}
+func NewConfig(c httpClient) *Config {
+	return &Config{
+		httpClient: c,
+	}
 }
 
 func (c Config) readConfig() (*Config, error) {
@@ -52,6 +60,7 @@ func (c Config) readConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	t.Config.httpClient = c.httpClient
 	return &t.Config, nil
 }
 
@@ -60,7 +69,7 @@ func (c *Config) refresh() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	body, err := post(fmt.Sprintf(firebaseRefreshEndpoint, c.ApiKey),
+	body, err := c.httpClient.post(fmt.Sprintf(firebaseRefreshEndpoint, c.ApiKey),
 		bytes.NewBuffer([]byte(fmt.Sprintf("grant_type=refresh_token&refresh_token=%s", c.RefreshToken))),
 		map[string]string{"Content-Type": "application/x-www-form-urlencoded"})
 	if err != nil {
@@ -88,7 +97,7 @@ func (c *Config) setConfigFile() ([]byte, error) {
 		return nil, errors.New("APIKEY is not found")
 	}
 
-	body, err := post(fmt.Sprintf(firebaseEndpoint, c.ApiKey), nil, map[string]string{
+	body, err := c.httpClient.post(fmt.Sprintf(firebaseEndpoint, c.ApiKey), nil, map[string]string{
 		"Content-Type": "application/json",
 	})
 

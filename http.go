@@ -6,7 +6,13 @@ import (
 	"net/http"
 )
 
-func post(path string, value io.Reader, header map[string]string) ([]byte, error) {
+type HttpClient struct{}
+
+func NewHttpClient() *HttpClient {
+	return &HttpClient{}
+}
+
+func (c HttpClient) post(path string, value io.Reader, header map[string]string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodPost, path, value)
 	if err != nil {
 		return nil, err

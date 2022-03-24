@@ -1,6 +1,7 @@
 package main
 
 func main() {
-	cfg := NewConfig()
+	c := NewHttpClient()
+	cfg := NewConfig(c)
 	cfg.setup()
 }
