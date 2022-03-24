@@ -1,4 +1,4 @@
-module fitman
+module github.com/gari8/fitman
 
 go 1.18
 
