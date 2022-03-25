@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -25,6 +26,11 @@ func (c HttpClient) post(path string, value io.Reader, header map[string]string)
 	if err != nil {
 		return nil, err
 	}
+
+	if resp.StatusCode >= http.StatusBadRequest {
+		return nil, errors.New("your apiKey is invalid")
+	}
+
 	defer resp.Body.Close()
 	return ioutil.ReadAll(resp.Body)
 }

@@ -94,15 +94,6 @@ func (c *Config) refresh() ([]byte, error) {
 func (c *Config) setConfigFile() ([]byte, error) {
 	fullPath := basedir + "/" + configFile
 
-	if err := c.ioHandler.MakeDir(basedir); err != nil {
-		return nil, err
-	}
-
-	f, err := c.ioHandler.OpenFile(fullPath, os.O_RDWR|os.O_CREATE, 0666)
-	if err != nil {
-		return nil, err
-	}
-
 	if c.ApiKey == "" {
 		return nil, errors.New("APIKEY is not found")
 	}
@@ -120,6 +111,17 @@ func (c *Config) setConfigFile() ([]byte, error) {
 	}
 
 	c.RefreshToken = info.RefreshToken
+
+	fmt.Println("koko", c)
+
+	if err := c.ioHandler.MakeDir(basedir); err != nil {
+		return nil, err
+	}
+
+	f, err := c.ioHandler.OpenFile(fullPath, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return nil, err
+	}
 
 	if _, err := c.ioHandler.Write(f, []byte(fmt.Sprintf(fileContentFormat,
 		c.ApiKey, c.RefreshToken))); err != nil {
