@@ -7,7 +7,15 @@ It provides appropriate token management and refresh to prevent unnecessary user
 
 Please, Put it in .gitignore when you use it by typing the command in the root of the project
 
+# how to install
+```
+$ go install github.com/gari8/fitman@latest
+```
+
 # how to use
+
+https://user-images.githubusercontent.com/49360378/160030479-bfa92883-d0aa-4b7e-bb05-b58c630db754.mov
+
 ```
 [sub commands]
 // create .fitman directory & get idToken

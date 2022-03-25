@@ -77,6 +77,9 @@ func (c Config) readConfig() (*Config, error) {
 }
 
 func (c *Config) refresh() ([]byte, error) {
+	if err := c.findOrCreateFiles(); err != nil {
+		return nil, err
+	}
 	c, err := c.readConfig()
 	if err != nil {
 		return nil, err
@@ -92,10 +95,8 @@ func (c *Config) refresh() ([]byte, error) {
 }
 
 func (c *Config) setConfigFile() ([]byte, error) {
-	fullPath := basedir + "/" + configFile
-
 	if c.ApiKey == "" {
-		return nil, errors.New("APIKEY is not found")
+		return nil, errors.New("apiKey is not found")
 	}
 
 	body, err := c.httpClient.post(fmt.Sprintf(firebaseEndpoint, c.ApiKey), nil, map[string]string{
@@ -112,21 +113,28 @@ func (c *Config) setConfigFile() ([]byte, error) {
 
 	c.RefreshToken = info.RefreshToken
 
-	fmt.Println("koko", c)
-
-	if err := c.ioHandler.MakeDir(basedir); err != nil {
-		return nil, err
-	}
-
-	f, err := c.ioHandler.OpenFile(fullPath, os.O_RDWR|os.O_CREATE, 0666)
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := c.ioHandler.Write(f, []byte(fmt.Sprintf(fileContentFormat,
-		c.ApiKey, c.RefreshToken))); err != nil {
+	if err := c.findOrCreateFiles(); err != nil {
 		return nil, err
 	}
 
 	return body, nil
+}
+
+func (c Config) findOrCreateFiles() error {
+	if _, err := os.Stat(basedir + "/" + configFile); os.IsNotExist(err) {
+		if err := c.ioHandler.MakeDir(basedir); err != nil {
+			return err
+		}
+
+		f, err := c.ioHandler.OpenFile(basedir+"/"+configFile, os.O_RDWR|os.O_CREATE, 0666)
+		if err != nil {
+			return err
+		}
+
+		if _, err := c.ioHandler.Write(f, []byte(fmt.Sprintf(fileContentFormat,
+			c.ApiKey, c.RefreshToken))); err != nil {
+			return err
+		}
+	}
+	return nil
 }

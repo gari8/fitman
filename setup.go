@@ -49,21 +49,34 @@ func (c *Config) setup() {
 		}
 		if c.RefreshToken == "" {
 			b, err = c.setConfigFile()
-		} else {
-			b, err = c.refresh()
-		}
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if verbose {
-			fmt.Println(string(b))
-		} else {
-			err := json.Unmarshal(b, &m)
 			if err != nil {
 				log.Fatalln(err)
 			}
-			// こっちはcamel case
-			fmt.Println(m["idToken"])
+			if verbose {
+				fmt.Println(string(b))
+			} else {
+				err := json.Unmarshal(b, &m)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				// こっちはcamel case
+				fmt.Println(m["idToken"])
+			}
+		} else {
+			b, err = c.refresh()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			if verbose {
+				fmt.Println(string(b))
+			} else {
+				err := json.Unmarshal(b, &m)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				// こっちはsnake case
+				fmt.Println(m["id_token"])
+			}
 		}
 	case getTokenInfo:
 		b, err := c.refresh()
@@ -81,7 +94,7 @@ func (c *Config) setup() {
 			fmt.Println(m["id_token"])
 		}
 	case version:
-		fmt.Println("v0.0.1")
+		fmt.Println("v0.3.28")
 	case help:
 		fmt.Println(helpContent)
 	}
