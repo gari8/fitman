@@ -107,13 +107,11 @@ var qs = []*survey.Question{
 			Message: "Please your API_KEY [required]",
 			Help:    "see 'https://console.firebase.google.com/u/0/project/<your-project-name>/settings/general'",
 		},
-		Validate:  survey.Required,
-		Transform: survey.Title,
+		Validate: survey.Required,
 	},
 	{
-		Name:      "refreshToken",
-		Prompt:    &survey.Input{Message: "Please your REFRESH_TOKEN"},
-		Transform: survey.Title,
+		Name:   "refreshToken",
+		Prompt: &survey.Input{Message: "Please your REFRESH_TOKEN"},
 	},
 	{
 		Name: "confirm",
