@@ -30,6 +30,9 @@ fitman get
 // show help
 fitman help
 
+// show projects
+fitman projects
+
 // show version
 fitman version
 
