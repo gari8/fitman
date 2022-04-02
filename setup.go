@@ -15,6 +15,7 @@ const (
 	getTokenInfo   = "get"
 	version        = "version"
 	help           = "help"
+	currentVersion = "v0.4.2"
 	helpContent    = `
 [sub commands]
 // create .fitman directory & get idToken
@@ -31,12 +32,15 @@ fitman help
 fitman version
 
 [option]
-fitman -v get`
+// -v -> verbose option
+fitman -v get
+fitman -v init`
+	defaultComment = `
+please enter fitman help`
 )
 
 func (c *Config) setup() {
 	var verbose bool
-	var m map[string]interface{}
 	flag.BoolVar(&verbose, "v", false, "view detailed information")
 	flag.Parse()
 	subCmd := flag.Arg(0)
@@ -52,30 +56,18 @@ func (c *Config) setup() {
 			if err != nil {
 				log.Fatalln(err)
 			}
-			if verbose {
-				fmt.Println(string(b))
-			} else {
-				err := json.Unmarshal(b, &m)
-				if err != nil {
-					log.Fatalln(err)
-				}
-				// こっちはcamel case
-				fmt.Println(m["idToken"])
+			// こっちはcamel case
+			if err := c.println(verbose, b, "idToken"); err != nil {
+				log.Fatalln(err)
 			}
 		} else {
 			b, err = c.refresh()
 			if err != nil {
 				log.Fatalln(err)
 			}
-			if verbose {
-				fmt.Println(string(b))
-			} else {
-				err := json.Unmarshal(b, &m)
-				if err != nil {
-					log.Fatalln(err)
-				}
-				// こっちはsnake case
-				fmt.Println(m["id_token"])
+			// こっちはsnake case
+			if err := c.println(verbose, b, "id_token"); err != nil {
+				log.Fatalln(err)
 			}
 		}
 	case getTokenInfo:
@@ -83,20 +75,16 @@ func (c *Config) setup() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		if verbose {
-			fmt.Println(string(b))
-		} else {
-			err := json.Unmarshal(b, &m)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			// こっちはsnake case
-			fmt.Println(m["id_token"])
+		// こっちはsnake case
+		if err := c.println(verbose, b, "id_token"); err != nil {
+			log.Fatalln(err)
 		}
 	case version:
-		fmt.Println("v0.3.28")
+		fmt.Println(currentVersion)
 	case help:
 		fmt.Println(helpContent)
+	default:
+		fmt.Println(defaultComment)
 	}
 }
 
@@ -135,5 +123,19 @@ func (c *Config) dialogue() error {
 	}
 	c.ApiKey = answers.ApiKey
 	c.RefreshToken = answers.RefreshToken
+	return nil
+}
+
+func (c Config) println(verbose bool, b []byte, key string) error {
+	var m map[string]interface{}
+	if verbose {
+		fmt.Println(string(b))
+	} else {
+		err := json.Unmarshal(b, &m)
+		if err != nil {
+			return err
+		}
+		fmt.Println(m[key])
+	}
 	return nil
 }

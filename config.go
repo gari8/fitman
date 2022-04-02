@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -43,6 +44,8 @@ type ioHandler interface {
 	MakeDir(dirPath string) error
 	OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
 	Write(f *os.File, b []byte) (n int, err error)
+	NotExists(path string) bool
+	GetHomeDirPath() (string, error)
 }
 
 type Config struct {
@@ -60,14 +63,9 @@ func NewConfig(c httpClient,
 	}
 }
 
-func (c Config) readConfig() (*Config, error) {
-	fullPath := basedir + "/" + configFile
-	content, err := c.ioHandler.ReadFile(fullPath)
-	if err != nil {
-		return nil, err
-	}
+func (c Config) readConfig(body []byte) (*Config, error) {
 	var t TomlSetting
-	_, err = c.ioHandler.DecodeToml(string(content), &t)
+	_, err := c.ioHandler.DecodeToml(string(body), &t)
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +75,11 @@ func (c Config) readConfig() (*Config, error) {
 }
 
 func (c *Config) refresh() ([]byte, error) {
-	if err := c.findOrCreateFiles(); err != nil {
+	b, err := c.find()
+	if err != nil {
 		return nil, err
 	}
-	c, err := c.readConfig()
+	c, err = c.readConfig(b)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +89,6 @@ func (c *Config) refresh() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return body, nil
 }
 
@@ -98,11 +96,9 @@ func (c *Config) setConfigFile() ([]byte, error) {
 	if c.ApiKey == "" {
 		return nil, errors.New("apiKey is not found")
 	}
-
 	body, err := c.httpClient.post(fmt.Sprintf(firebaseEndpoint, c.ApiKey), nil, map[string]string{
 		"Content-Type": "application/json",
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -110,31 +106,41 @@ func (c *Config) setConfigFile() ([]byte, error) {
 	if err := json.Unmarshal(body, &info); err != nil {
 		return nil, err
 	}
-
 	c.RefreshToken = info.RefreshToken
-
-	if err := c.findOrCreateFiles(); err != nil {
-		return nil, err
-	}
-
-	return body, nil
+	return body, c.writeFiles()
 }
 
-func (c Config) findOrCreateFiles() error {
-	if _, err := os.Stat(basedir + "/" + configFile); os.IsNotExist(err) {
-		if err := c.ioHandler.MakeDir(basedir); err != nil {
-			return err
-		}
-
-		f, err := c.ioHandler.OpenFile(basedir+"/"+configFile, os.O_RDWR|os.O_CREATE, 0666)
-		if err != nil {
-			return err
-		}
-
-		if _, err := c.ioHandler.Write(f, []byte(fmt.Sprintf(fileContentFormat,
-			c.ApiKey, c.RefreshToken))); err != nil {
+func (c Config) writeFiles() error {
+	home, err := c.ioHandler.GetHomeDirPath()
+	if err != nil {
+		return err
+	}
+	if c.ioHandler.NotExists(filepath.Join(home, basedir)) {
+		if err := c.ioHandler.MakeDir(filepath.Join(home, basedir)); err != nil {
 			return err
 		}
 	}
+	f, err := c.ioHandler.OpenFile(filepath.Join(home, basedir, configFile), os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	if _, err := c.ioHandler.Write(f, []byte(fmt.Sprintf(fileContentFormat,
+		c.ApiKey, c.RefreshToken))); err != nil {
+		return err
+	}
 	return nil
+}
+
+func (c Config) find() ([]byte, error) {
+	home, err := c.ioHandler.GetHomeDirPath()
+	if err != nil {
+		return nil, err
+	}
+	if c.ioHandler.NotExists(filepath.Join(home, basedir)) {
+		return nil, errors.New(".fitman is not found. please `fitman init`")
+	}
+	if c.ioHandler.NotExists(filepath.Join(home, basedir, configFile)) {
+		return nil, errors.New("setting file is not found. please `fitman init`")
+	}
+	return c.ioHandler.ReadFile(filepath.Join(home, basedir, configFile))
 }
