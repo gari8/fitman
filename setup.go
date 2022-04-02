@@ -16,7 +16,7 @@ const (
 	getTokenInfo   = "get"
 	version        = "version"
 	help           = "help"
-	currentVersion = "v0.4.2"
+	currentVersion = "v0.4.21"
 	helpContent    = `
 [sub commands]
 // create .fitman directory & get idToken

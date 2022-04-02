@@ -131,9 +131,7 @@ func (c Config) writeFiles() error {
 		}
 	}
 	if c.SubCmd == initialization {
-		if err := c.ioHandler.RemoveFile(filepath.Join(home, basedir, configFile)); err != nil {
-			return err
-		}
+		_ = c.ioHandler.RemoveFile(filepath.Join(home, basedir, configFile))
 	}
 	f, err := c.ioHandler.OpenFile(filepath.Join(home, basedir, configFile), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
