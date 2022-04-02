@@ -22,6 +22,8 @@ const (
 // create .fitman directory & get idToken
 fitman init
 
+// add new field 'dev'
+fitman -p dev add
 
 // show idToken (after init) 
 fitman get
@@ -33,9 +35,24 @@ fitman help
 fitman version
 
 [option]
-// -v -> verbose option
-fitman -v get
-fitman -v init`
+v: verbose
+	fitman -v get
+	{
+	  "access_token": "dummy",
+	  "expires_in": "3600",
+	  "token_type": "Bearer",
+	  "refresh_token": "dummy",
+	  "id_token": "dummy",
+	  "user_id": "dummy",
+	  "project_id": "dummy"
+	}
+
+p: profile
+	fitman -p qa init
+	fitman -p dev init
+	...
+	fitman -p qa get
+	fitman -p dev get`
 	defaultComment = `
 please enter fitman help`
 )

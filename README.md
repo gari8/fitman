@@ -21,6 +21,8 @@ https://user-images.githubusercontent.com/49360378/160030479-bfa92883-d0aa-4b7e-
 // create .fitman directory & get idToken
 fitman init
 
+// add new field `dev`
+fitman -p dev add
 
 // show idToken (after init) 
 fitman get
@@ -32,6 +34,7 @@ fitman help
 fitman version
 
 [option]
+v: verbose
 fitman -v get
 {
   "access_token": "dummy",
@@ -43,5 +46,11 @@ fitman -v get
   "project_id": "dummy"
 }
 
+p: profile
+fitman -p qa init
+fitman -p dev init
+...
+fitman -p qa get
+fitman -p dev get
 ```
 
