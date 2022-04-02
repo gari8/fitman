@@ -29,12 +29,14 @@ func TestNewConfig(t *testing.T) {
 }
 
 func TestConfig_readConfig(t *testing.T) {
+	toml := `[default]
+name=test`
 	io := getMockIoHandler(t)
-	io.EXPECT().ReadFile(gomock.Any()).Return([]byte("test"), nil).AnyTimes()
 	io.EXPECT().DecodeToml(gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
+	io.EXPECT().GetHomeDirPath().Return("/", nil).AnyTimes()
 	hc := getMockHttpClient(t)
 	c := NewConfig(hc, io)
-	c, err := c.readConfig()
+	c, err := c.readConfig([]byte(toml))
 	assert.NoError(t, err)
 }
 
@@ -46,6 +48,8 @@ func TestConfig_refresh(t *testing.T) {
 	io.EXPECT().Write(gomock.Any(), gomock.Any()).Return(0, nil).AnyTimes()
 	io.EXPECT().ReadFile(gomock.Any()).Return(expected, nil).AnyTimes()
 	io.EXPECT().DecodeToml(gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
+	io.EXPECT().NotExists(gomock.Any()).Return(false).AnyTimes()
+	io.EXPECT().GetHomeDirPath().Return("/", nil).AnyTimes()
 	hc := getMockHttpClient(t)
 	hc.EXPECT().post(gomock.Any(), gomock.Any(), gomock.Any()).Return(expected, nil).AnyTimes()
 	c := NewConfig(hc, io)
@@ -64,6 +68,8 @@ func TestConfig_setConfigFile(t *testing.T) {
 "localId": "a"
 }`)
 	io := getMockIoHandler(t)
+	io.EXPECT().NotExists(gomock.Any()).Return(false).AnyTimes()
+	io.EXPECT().GetHomeDirPath().Return("/", nil).AnyTimes()
 	io.EXPECT().MakeDir(gomock.Any()).Return(nil).AnyTimes()
 	io.EXPECT().OpenFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(&os.File{}, nil).AnyTimes()
 	io.EXPECT().Write(gomock.Any(), gomock.Any()).Return(0, nil).AnyTimes()
@@ -77,8 +83,10 @@ func TestConfig_setConfigFile(t *testing.T) {
 	assert.Equal(t, expected, b)
 }
 
-func TestConfig_findOrCreateFiles(t *testing.T) {
+func TestConfig_writeFiles(t *testing.T) {
 	io := getMockIoHandler(t)
+	io.EXPECT().NotExists(gomock.Any()).Return(false).AnyTimes()
+	io.EXPECT().GetHomeDirPath().Return("/", nil).AnyTimes()
 	io.EXPECT().MakeDir(gomock.Any()).Return(nil).AnyTimes()
 	io.EXPECT().OpenFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(&os.File{}, nil).AnyTimes()
 	io.EXPECT().Write(gomock.Any(), gomock.Any()).Return(0, nil).AnyTimes()
@@ -86,5 +94,18 @@ func TestConfig_findOrCreateFiles(t *testing.T) {
 	c := NewConfig(hc, io)
 	c.ApiKey = "test"
 
-	assert.NoError(t, c.findOrCreateFiles())
+	assert.NoError(t, c.writeFiles())
+}
+
+func TestConfig_find(t *testing.T) {
+	io := getMockIoHandler(t)
+	io.EXPECT().NotExists(gomock.Any()).Return(false).AnyTimes()
+	io.EXPECT().GetHomeDirPath().Return("/", nil).AnyTimes()
+	io.EXPECT().ReadFile(gomock.Any()).Return([]byte("test"), nil).AnyTimes()
+	hc := getMockHttpClient(t)
+	c := NewConfig(hc, io)
+	c.ApiKey = "test"
+	body, err := c.find()
+	assert.NoError(t, err)
+	assert.Equal(t, body, []byte("test"))
 }

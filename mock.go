@@ -88,6 +88,21 @@ func (mr *MockioHandlerMockRecorder) DecodeToml(data, v interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecodeToml", reflect.TypeOf((*MockioHandler)(nil).DecodeToml), data, v)
 }
 
+// GetHomeDirPath mocks base method.
+func (m *MockioHandler) GetHomeDirPath() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetHomeDirPath")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetHomeDirPath indicates an expected call of GetHomeDirPath.
+func (mr *MockioHandlerMockRecorder) GetHomeDirPath() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHomeDirPath", reflect.TypeOf((*MockioHandler)(nil).GetHomeDirPath))
+}
+
 // MakeDir mocks base method.
 func (m *MockioHandler) MakeDir(dirPath string) error {
 	m.ctrl.T.Helper()
@@ -100,6 +115,20 @@ func (m *MockioHandler) MakeDir(dirPath string) error {
 func (mr *MockioHandlerMockRecorder) MakeDir(dirPath interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeDir", reflect.TypeOf((*MockioHandler)(nil).MakeDir), dirPath)
+}
+
+// NotExists mocks base method.
+func (m *MockioHandler) NotExists(path string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NotExists", path)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// NotExists indicates an expected call of NotExists.
+func (mr *MockioHandlerMockRecorder) NotExists(path interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotExists", reflect.TypeOf((*MockioHandler)(nil).NotExists), path)
 }
 
 // OpenFile mocks base method.

@@ -36,3 +36,12 @@ func (h IoHandler) OpenFile(name string, flag int, perm os.FileMode) (*os.File, 
 func (h IoHandler) Write(f *os.File, b []byte) (n int, err error) {
 	return f.Write(b)
 }
+
+func (h IoHandler) NotExists(path string) bool {
+	_, err := os.Stat(path)
+	return os.IsNotExist(err)
+}
+
+func (h IoHandler) GetHomeDirPath() (string, error) {
+	return os.UserHomeDir()
+}
