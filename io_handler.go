@@ -16,8 +16,8 @@ func (h IoHandler) ReadFile(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
 
-func (h IoHandler) DecodeToml(data string, v *TomlSetting) (interface{}, error) {
-	return toml.Decode(data, &v)
+func (h IoHandler) DecodeToml(data string, v interface{}) (interface{}, error) {
+	return toml.Decode(data, v)
 }
 
 func (h IoHandler) MakeDir(dirPath string) error {
@@ -44,4 +44,8 @@ func (h IoHandler) NotExists(path string) bool {
 
 func (h IoHandler) GetHomeDirPath() (string, error) {
 	return os.UserHomeDir()
+}
+
+func (h IoHandler) RemoveFile(path string) error {
+	return os.Remove(path)
 }

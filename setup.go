@@ -12,6 +12,7 @@ import (
 
 const (
 	initialization = "init"
+	additional     = "add"
 	getTokenInfo   = "get"
 	version        = "version"
 	help           = "help"
@@ -21,6 +22,8 @@ const (
 // create .fitman directory & get idToken
 fitman init
 
+// add new field 'dev'
+fitman -p dev add
 
 // show idToken (after init) 
 fitman get
@@ -32,9 +35,24 @@ fitman help
 fitman version
 
 [option]
-// -v -> verbose option
-fitman -v get
-fitman -v init`
+v: verbose
+	fitman -v get
+	{
+	  "access_token": "dummy",
+	  "expires_in": "3600",
+	  "token_type": "Bearer",
+	  "refresh_token": "dummy",
+	  "id_token": "dummy",
+	  "user_id": "dummy",
+	  "project_id": "dummy"
+	}
+
+p: profile
+	fitman -p qa init
+	fitman -p dev init
+	...
+	fitman -p qa get
+	fitman -p dev get`
 	defaultComment = `
 please enter fitman help`
 )
@@ -42,10 +60,24 @@ please enter fitman help`
 func (c *Config) setup() {
 	var verbose bool
 	flag.BoolVar(&verbose, "v", false, "view detailed information")
+	flag.StringVar(&c.Profile, "p", "default", "token profile")
 	flag.Parse()
-	subCmd := flag.Arg(0)
-	switch subCmd {
-	case initialization:
+	c.SubCmd = flag.Arg(0)
+	switch c.SubCmd {
+	case initialization, additional:
+		if c.SubCmd == additional {
+			tomlBody, err := c.find()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			exists, err := c.contains(tomlBody, c.Profile)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			if exists {
+				log.Fatalln(fmt.Errorf("`%s` key is already exist", c.Profile))
+			}
+		}
 		var b []byte
 		var err error
 		if err := c.dialogue(); err != nil {
@@ -61,6 +93,17 @@ func (c *Config) setup() {
 				log.Fatalln(err)
 			}
 		} else {
+			if err := c.writeFiles(); err != nil {
+				log.Fatalln(err)
+			}
+			tomlBody, err := c.find()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			c, err = c.readConfig(tomlBody)
+			if err != nil {
+				log.Fatalln(err)
+			}
 			b, err = c.refresh()
 			if err != nil {
 				log.Fatalln(err)
@@ -71,6 +114,14 @@ func (c *Config) setup() {
 			}
 		}
 	case getTokenInfo:
+		tomlBody, err := c.find()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		c, err = c.readConfig(tomlBody)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		b, err := c.refresh()
 		if err != nil {
 			log.Fatalln(err)

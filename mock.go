@@ -74,7 +74,7 @@ func (m *MockioHandler) EXPECT() *MockioHandlerMockRecorder {
 }
 
 // DecodeToml mocks base method.
-func (m *MockioHandler) DecodeToml(data string, v *TomlSetting) (interface{}, error) {
+func (m *MockioHandler) DecodeToml(data string, v interface{}) (interface{}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DecodeToml", data, v)
 	ret0, _ := ret[0].(interface{})
@@ -159,6 +159,20 @@ func (m *MockioHandler) ReadFile(path string) ([]byte, error) {
 func (mr *MockioHandlerMockRecorder) ReadFile(path interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadFile", reflect.TypeOf((*MockioHandler)(nil).ReadFile), path)
+}
+
+// RemoveFile mocks base method.
+func (m *MockioHandler) RemoveFile(path string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveFile", path)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveFile indicates an expected call of RemoveFile.
+func (mr *MockioHandlerMockRecorder) RemoveFile(path interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveFile", reflect.TypeOf((*MockioHandler)(nil).RemoveFile), path)
 }
 
 // Write mocks base method.
