@@ -12,6 +12,7 @@ import (
 
 const (
 	initialization = "init"
+	additional     = "add"
 	getTokenInfo   = "get"
 	version        = "version"
 	help           = "help"
@@ -42,10 +43,24 @@ please enter fitman help`
 func (c *Config) setup() {
 	var verbose bool
 	flag.BoolVar(&verbose, "v", false, "view detailed information")
+	flag.StringVar(&c.Profile, "p", "default", "token profile")
 	flag.Parse()
-	subCmd := flag.Arg(0)
-	switch subCmd {
-	case initialization:
+	c.SubCmd = flag.Arg(0)
+	switch c.SubCmd {
+	case initialization, additional:
+		if c.SubCmd == additional {
+			tomlBody, err := c.find()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			exists, err := c.contains(tomlBody, c.Profile)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			if exists {
+				log.Fatalln(fmt.Errorf("`%s` key is already exist", c.Profile))
+			}
+		}
 		var b []byte
 		var err error
 		if err := c.dialogue(); err != nil {
@@ -61,6 +76,17 @@ func (c *Config) setup() {
 				log.Fatalln(err)
 			}
 		} else {
+			if err := c.writeFiles(); err != nil {
+				log.Fatalln(err)
+			}
+			tomlBody, err := c.find()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			c, err = c.readConfig(tomlBody)
+			if err != nil {
+				log.Fatalln(err)
+			}
 			b, err = c.refresh()
 			if err != nil {
 				log.Fatalln(err)
@@ -71,6 +97,14 @@ func (c *Config) setup() {
 			}
 		}
 	case getTokenInfo:
+		tomlBody, err := c.find()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		c, err = c.readConfig(tomlBody)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		b, err := c.refresh()
 		if err != nil {
 			log.Fatalln(err)

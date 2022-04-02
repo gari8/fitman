@@ -17,7 +17,8 @@ const (
 	configFile              = "config.toml"
 	firebaseEndpoint        = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=%s"
 	firebaseRefreshEndpoint = "https://securetoken.googleapis.com/v1/token?key=%s"
-	fileContentFormat       = `[default]
+	fileContentFormat       = `
+[%s]
 api_key="%s"
 refresh_token="%s"`
 )
@@ -30,27 +31,26 @@ type tokenInfo struct {
 	LocalId      string `json:"localId"`
 }
 
-type TomlSetting struct {
-	Config `toml:"default"`
-}
-
 type httpClient interface {
 	post(path string, value io.Reader, header map[string]string) ([]byte, error)
 }
 
 type ioHandler interface {
 	ReadFile(path string) ([]byte, error)
-	DecodeToml(data string, v *TomlSetting) (interface{}, error)
+	DecodeToml(data string, v interface{}) (interface{}, error)
 	MakeDir(dirPath string) error
 	OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
 	Write(f *os.File, b []byte) (n int, err error)
 	NotExists(path string) bool
 	GetHomeDirPath() (string, error)
+	RemoveFile(path string) error
 }
 
 type Config struct {
 	ApiKey       string `toml:"api_key"`
 	RefreshToken string `toml:"refresh_token"`
+	Profile      string `json:"profile"`
+	SubCmd       string `json:"subCmd"`
 	httpClient
 	ioHandler
 }
@@ -64,25 +64,35 @@ func NewConfig(c httpClient,
 }
 
 func (c Config) readConfig(body []byte) (*Config, error) {
-	var t TomlSetting
+	var t map[string]interface{}
 	_, err := c.ioHandler.DecodeToml(string(body), &t)
 	if err != nil {
 		return nil, err
 	}
-	t.Config.httpClient = c.httpClient
-	t.Config.ioHandler = c.ioHandler
-	return &t.Config, nil
+	m, ok := t[c.Profile].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("no field %s", c.Profile)
+	}
+	c.ApiKey = m["api_key"].(string)
+	c.RefreshToken = m["refresh_token"].(string)
+	return &c, nil
+}
+
+func (c Config) contains(body []byte, key string) (bool, error) {
+	var t map[string]interface{}
+	_, err := c.ioHandler.DecodeToml(string(body), &t)
+	if err != nil {
+		return false, err
+	}
+	for k, _ := range t {
+		if k == key {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func (c *Config) refresh() ([]byte, error) {
-	b, err := c.find()
-	if err != nil {
-		return nil, err
-	}
-	c, err = c.readConfig(b)
-	if err != nil {
-		return nil, err
-	}
 	body, err := c.httpClient.post(fmt.Sprintf(firebaseRefreshEndpoint, c.ApiKey),
 		bytes.NewBuffer([]byte(fmt.Sprintf("grant_type=refresh_token&refresh_token=%s", c.RefreshToken))),
 		map[string]string{"Content-Type": "application/x-www-form-urlencoded"})
@@ -120,12 +130,17 @@ func (c Config) writeFiles() error {
 			return err
 		}
 	}
-	f, err := c.ioHandler.OpenFile(filepath.Join(home, basedir, configFile), os.O_RDWR|os.O_CREATE, 0666)
+	if c.SubCmd == initialization {
+		if err := c.ioHandler.RemoveFile(filepath.Join(home, basedir, configFile)); err != nil {
+			return err
+		}
+	}
+	f, err := c.ioHandler.OpenFile(filepath.Join(home, basedir, configFile), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return err
 	}
 	if _, err := c.ioHandler.Write(f, []byte(fmt.Sprintf(fileContentFormat,
-		c.ApiKey, c.RefreshToken))); err != nil {
+		c.Profile, c.ApiKey, c.RefreshToken))); err != nil {
 		return err
 	}
 	return nil
