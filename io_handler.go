@@ -16,7 +16,7 @@ func (h IoHandler) ReadFile(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
 
-func (h IoHandler) DecodeToml(data string, v interface{}) (interface{}, error) {
+func (h IoHandler) DecodeToml(data string, v interface{}) (toml.MetaData, error) {
 	return toml.Decode(data, v)
 }
 

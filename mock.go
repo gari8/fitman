@@ -9,6 +9,7 @@ import (
 	os "os"
 	reflect "reflect"
 
+	toml "github.com/BurntSushi/toml"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -74,10 +75,10 @@ func (m *MockioHandler) EXPECT() *MockioHandlerMockRecorder {
 }
 
 // DecodeToml mocks base method.
-func (m *MockioHandler) DecodeToml(data string, v interface{}) (interface{}, error) {
+func (m *MockioHandler) DecodeToml(data string, v interface{}) (toml.MetaData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DecodeToml", data, v)
-	ret0, _ := ret[0].(interface{})
+	ret0, _ := ret[0].(toml.MetaData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

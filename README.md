@@ -23,8 +23,6 @@ fitman init
 
 // add new field `dev`
 fitman add dev
-// or
-fitman -p dev add
 
 // show idToken (after init) 
 fitman get
@@ -47,12 +45,5 @@ fitman -v get
   "user_id": "dummy",
   "project_id": "dummy"
 }
-
-p: profile
-fitman -p qa init
-fitman -p dev init
-...
-fitman -p qa get
-fitman -p dev get
 ```
 

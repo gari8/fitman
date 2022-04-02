@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 )
@@ -14,9 +15,10 @@ const (
 	initialization = "init"
 	additional     = "add"
 	getTokenInfo   = "get"
+	projects       = "projects"
 	version        = "version"
 	help           = "help"
-	currentVersion = "v0.4.22"
+	currentVersion = "v0.4.3"
 	helpContent    = `
 [sub commands]
 // create .fitman directory & get idToken
@@ -24,11 +26,11 @@ fitman init
 
 // add new field "dev"
 fitman add dev
-// or
-fitman -p dev add
 
 // show idToken (after init) 
 fitman get
+// show idToken 'dev'
+fitman get dev
 
 // show help
 fitman help
@@ -47,30 +49,36 @@ v: verbose
 	  "id_token": "dummy",
 	  "user_id": "dummy",
 	  "project_id": "dummy"
-	}
-
-p: profile
-	fitman -p qa init
-	fitman -p dev init
-	...
-	fitman -p qa get
-	fitman -p dev get`
+	}`
 	defaultComment = `
 please enter fitman help`
 )
 
 func (c *Config) setup() {
+	c.Profile = "default"
 	var verbose bool
 	flag.BoolVar(&verbose, "v", false, "view detailed information")
-	flag.StringVar(&c.Profile, "p", "default", "token profile")
 	flag.Parse()
 	c.SubCmd = flag.Arg(0)
 	switch c.SubCmd {
+	case initialization, additional, getTokenInfo:
+		if flag.Arg(1) != "" {
+			c.Profile = flag.Arg(1)
+		}
+	}
+	switch c.SubCmd {
+	case projects:
+		tomlBody, err := c.find()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		list, err := c.readKeys(tomlBody)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println(fmt.Sprintf("[%s]", strings.Join(list, ",")))
 	case initialization, additional:
 		if c.SubCmd == additional {
-			if flag.Arg(1) != "" {
-				c.Profile = flag.Arg(1)
-			}
 			tomlBody, err := c.find()
 			if err != nil {
 				log.Fatalln(err)

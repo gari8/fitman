@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"io"
 	"os"
 	"path/filepath"
@@ -37,7 +38,7 @@ type httpClient interface {
 
 type ioHandler interface {
 	ReadFile(path string) ([]byte, error)
-	DecodeToml(data string, v interface{}) (interface{}, error)
+	DecodeToml(data string, v interface{}) (toml.MetaData, error)
 	MakeDir(dirPath string) error
 	OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
 	Write(f *os.File, b []byte) (n int, err error)
@@ -76,6 +77,19 @@ func (c Config) readConfig(body []byte) (*Config, error) {
 	c.ApiKey = m["api_key"].(string)
 	c.RefreshToken = m["refresh_token"].(string)
 	return &c, nil
+}
+
+func (c Config) readKeys(body []byte) ([]string, error) {
+	var t map[string]interface{}
+	_, err := c.ioHandler.DecodeToml(string(body), &t)
+	if err != nil {
+		return nil, err
+	}
+	var s []string
+	for k := range t {
+		s = append(s, "\""+k+"\"")
+	}
+	return s, nil
 }
 
 func (c Config) contains(body []byte, key string) (bool, error) {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/BurntSushi/toml"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -42,17 +43,17 @@ refresh_token="test"`
 }
 
 func TestConfig_refresh(t *testing.T) {
-	toml := `
+	tomlData := `
 [default]
 api_key="test"
 refresh_token="test"`
-	expected := []byte(toml)
+	expected := []byte(tomlData)
 	io := getMockIoHandler(t)
 	io.EXPECT().MakeDir(gomock.Any()).Return(nil).AnyTimes()
 	io.EXPECT().OpenFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(&os.File{}, nil).AnyTimes()
 	io.EXPECT().Write(gomock.Any(), gomock.Any()).Return(0, nil).AnyTimes()
 	io.EXPECT().ReadFile(gomock.Any()).Return(expected, nil).AnyTimes()
-	io.EXPECT().DecodeToml(gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
+	io.EXPECT().DecodeToml(gomock.Any(), gomock.Any()).Return(toml.MetaData{}, nil).AnyTimes()
 	io.EXPECT().NotExists(gomock.Any()).Return(false).AnyTimes()
 	io.EXPECT().GetHomeDirPath().Return("/", nil).AnyTimes()
 	hc := getMockHttpClient(t)
