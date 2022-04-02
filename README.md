@@ -22,6 +22,8 @@ https://user-images.githubusercontent.com/49360378/160030479-bfa92883-d0aa-4b7e-
 fitman init
 
 // add new field `dev`
+fitman add dev
+// or
 fitman -p dev add
 
 // show idToken (after init) 

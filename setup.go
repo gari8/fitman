@@ -22,7 +22,9 @@ const (
 // create .fitman directory & get idToken
 fitman init
 
-// add new field 'dev'
+// add new field "dev"
+fitman add dev
+// or
 fitman -p dev add
 
 // show idToken (after init) 
@@ -66,6 +68,9 @@ func (c *Config) setup() {
 	switch c.SubCmd {
 	case initialization, additional:
 		if c.SubCmd == additional {
+			if flag.Arg(1) != "" {
+				c.Profile = flag.Arg(1)
+			}
 			tomlBody, err := c.find()
 			if err != nil {
 				log.Fatalln(err)
