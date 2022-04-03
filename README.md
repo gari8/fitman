@@ -21,7 +21,7 @@ https://user-images.githubusercontent.com/49360378/160030479-bfa92883-d0aa-4b7e-
 // create .fitman directory & get idToken
 fitman init
 
-// add new field `dev`
+// add new project `dev`
 fitman add dev
 
 // show idToken (after init) 
