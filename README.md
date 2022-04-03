@@ -5,8 +5,6 @@
 fitman is the token manager for firebase-auth.
 It provides appropriate token management and refresh to prevent unnecessary user creation and unify token management methods during intra-team development.
 
-Please, Put it in .gitignore when you use it by typing the command in the root of the project
-
 # how to install
 ```
 $ go install github.com/gari8/fitman@latest
@@ -18,7 +16,7 @@ https://user-images.githubusercontent.com/49360378/160030479-bfa92883-d0aa-4b7e-
 
 ```
 [sub commands]
-// create .fitman directory & get idToken
+// create .fitman directory at your home-directory & get idToken
 fitman init
 
 // add new project `dev`
