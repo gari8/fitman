@@ -27,7 +27,7 @@ jobs:
         run: go mod download
 
       - name: Build Code
-        run: go build -o cmd .
+        run: go build -o _artifact .
 
       - name: Show Version
-        run: ./cmd --version
+        run: ./_artifact --version
