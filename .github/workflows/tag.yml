@@ -6,8 +6,8 @@ on:
       - main
       - master
       - feat/#3_use_cobra
-    types:
-      - closed
+#    types:
+#      - closed
 
 jobs:
   create-tag:
