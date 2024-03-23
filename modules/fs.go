@@ -22,7 +22,7 @@ refresh_token="%s"`
 )
 
 type (
-	FStream        struct{}
+	FS             struct{}
 	ConfigResponse map[string]struct {
 		ApiKey       string `toml:"api_key" json:"apiKey"`
 		RefreshToken string `toml:"refresh_token" json:"refreshToken"`
@@ -38,11 +38,11 @@ type (
 	}
 )
 
-func NewFS() *FStream {
-	return &FStream{}
+func NewFS() *FS {
+	return &FS{}
 }
 
-func (s *FStream) ReadConfig() (ConfigResponse, error) {
+func (s *FS) ReadConfig() (ConfigResponse, error) {
 	var resp ConfigResponse
 	_, err := toml.DecodeFile(filepath.Join(homeDir, basedir, configFile), &resp)
 	if err != nil {
@@ -55,12 +55,12 @@ func (s *FStream) ReadConfig() (ConfigResponse, error) {
 	return resp, nil
 }
 
-func (s *FStream) Exists(path string) bool {
+func (s *FS) Exists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
 }
 
-func (s *FStream) SetConfig(requests []ConfigRequest, override bool) error {
+func (s *FS) SetConfig(requests []ConfigRequest, override bool) error {
 	basePath := filepath.Join(homeDir, basedir)
 	if !s.Exists(basePath) {
 		if err := os.Mkdir(basePath, osPerm); err != nil {
@@ -82,7 +82,7 @@ func (s *FStream) SetConfig(requests []ConfigRequest, override bool) error {
 	return err
 }
 
-func (s *FStream) Dialogue(override bool) (DialogueResponse, error) {
+func (s *FS) Dialogue(override bool) (DialogueResponse, error) {
 	var resp DialogueResponse
 	var answers = struct {
 		ApiKey       string `survey:"apiKey"`
@@ -109,7 +109,7 @@ func (s *FStream) Dialogue(override bool) (DialogueResponse, error) {
 	return resp, nil
 }
 
-func (s *FStream) Confirm() error {
+func (s *FS) Confirm() error {
 	var answers = struct {
 		Confirm bool `survey:"confirm"`
 	}{}

@@ -10,7 +10,7 @@ const (
 )
 
 type Params struct {
-	Verbose bool
+	OnlyIdToken bool
 }
 
 func SetParams(parent context.Context, params *Params) context.Context {

@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	cliVersion      = "1.0.0"
-	verboseFlagName = "verbose"
+	cliVersion = "1.0.0"
+	onlyToken  = "only-token"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -51,16 +51,22 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.PersistentFlags().BoolP(verboseFlagName, "v", false, "Use verbose")
+	getCmd.PersistentFlags().BoolP(onlyToken, "o", false, "Get only idToken")
+	initCmd.PersistentFlags().BoolP(onlyToken, "o", false, "Get only idToken")
+	addCmd.PersistentFlags().BoolP(onlyToken, "o", false, "Get only idToken")
 }
 
 func Handle(f func(cmd *cobra.Command, args []string) error) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		//isVerbose, err := cmd.PersistentFlags().GetBool(verboseFlagName)
-		//if err != nil {
-		//	log.Fatalln(err)
-		//}
-		cmd.SetContext(facades.SetParams(cmd.Context(), &facades.Params{Verbose: true}))
+		var params *facades.Params
+		if cmd.HasAvailablePersistentFlags() {
+			onlyIdToken, err := cmd.PersistentFlags().GetBool(onlyToken)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			params = &facades.Params{OnlyIdToken: onlyIdToken}
+		}
+		cmd.SetContext(facades.SetParams(cmd.Context(), params))
 		if err := f(cmd, args); err != nil {
 			log.Fatalln(err)
 		}

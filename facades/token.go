@@ -27,11 +27,19 @@ func RunGet(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	b, err := json.Marshal(refreshToken)
+	params, err := GetParams(cmd.Context())
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(b))
+	if !params.OnlyIdToken {
+		b, err := json.Marshal(refreshToken)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(b))
+		return nil
+	}
+	fmt.Println(refreshToken.IdToken)
 	return nil
 }
 
@@ -63,11 +71,19 @@ func RunInit(cmd *cobra.Command, args []string) error {
 	}, true); err != nil {
 		return err
 	}
-	b, err := json.Marshal(refreshResp)
+	params, err := GetParams(cmd.Context())
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(b))
+	if !params.OnlyIdToken {
+		b, err := json.Marshal(refreshResp)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(b))
+		return nil
+	}
+	fmt.Println(refreshResp.IdToken)
 	return nil
 }
 
@@ -105,11 +121,19 @@ func RunAdd(cmd *cobra.Command, args []string) error {
 	}, false); err != nil {
 		return err
 	}
-	b, err := json.Marshal(refreshResp)
+	params, err := GetParams(cmd.Context())
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(b))
+	if !params.OnlyIdToken {
+		b, err := json.Marshal(refreshResp)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(b))
+		return nil
+	}
+	fmt.Println(refreshResp.IdToken)
 	return nil
 }
 
