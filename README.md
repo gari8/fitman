@@ -13,63 +13,21 @@ $ go install github.com/gari8/fitman@latest
 ```
 
 # how to use
+## commands
+### fitman i, init [profile]
+-> initialize fitman with setting profile
 
-https://user-images.githubusercontent.com/49360378/160030479-bfa92883-d0aa-4b7e-bb05-b58c630db754.mov
+### fitman a, add [profile]
+-> add profile to fitman's db
 
-```
-[sub commands]
-// create .fitman directory & get idToken
-fitman init
+### fitman d, delete [profile]
+-> delete profile from fitman's db
 
-// add new field `dev`
-fitman add dev
+### fitman ls, list
+-> show registered profiles
 
-// show idToken (after init) 
-fitman get
+### fitman g, get [profile]
+-> get profile's idToken
 
-// show help
-fitman help
-
-// show projects
-fitman projects
-
-// show version
-fitman version
-
-[option]
-v: verbose
-fitman -v get
-{
-  "access_token": "dummy",
-  "expires_in": "3600",
-  "token_type": "Bearer",
-  "refresh_token": "dummy",
-  "id_token": "dummy",
-  "user_id": "dummy",
-  "project_id": "dummy"
-}
-```
-
-
--------------------------------------------------
-
-new commands 
-
-fitman i, init
--> create .fitman directory
-
-fitman a, add __field__
--> add field to fitman's db
--> override ok?
-
-fitman d, delete __field__
--> delete field from fitman's db
-
-fitman ls, list
--> show registered projects
-
-fitman g, get (__field__)
--> get field's token
-
-fitman help
-fitman version
+### fitman help
+### fitman --version
