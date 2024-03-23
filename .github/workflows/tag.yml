@@ -1,12 +1,12 @@
 name: create tag
 
 on:
-  pull_request:
-    branches:
-      - main
-      - master
-    types:
-      - closed
+#  pull_request:
+#    branches:
+#      - main
+#      - master
+#    types:
+#      - closed
   push:
     branches:
       - feat/#3_use_cobra
