@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	cliVersion      = "1.0.0"
+	cliVersion      = "0.9.0"
 	verboseFlagName = "verbose"
 )
 

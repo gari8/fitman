@@ -32,4 +32,9 @@ jobs:
       - name: Show Version
         run: |
           VERSION=`./_artifact --version | awk '{print $3}'` \
-          && echo $VERSION
+          && echo $VERSION > TAG_NAME && echo $TAG_NAME
+
+      - name: create tag
+        run: |
+          git tag $(cat TAG_NAME) && \
+          git push origin $(cat TAG_NAME)
