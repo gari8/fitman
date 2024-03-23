@@ -30,4 +30,6 @@ jobs:
         run: go build -o _artifact .
 
       - name: Show Version
-        run: ./_artifact --version
+        run: |
+          VERSION=`./_artifact --version | awk '{print $3}'` \
+          && echo $VERSION
