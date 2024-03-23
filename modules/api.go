@@ -53,12 +53,15 @@ type (
 	}
 )
 
-func NewApiClient(apiKey, refreshToken string, httpClient httpClient) *ApiClient {
+func NewApiClient(httpClient httpClient) *ApiClient {
 	return &ApiClient{
-		apiKey:       apiKey,
-		refreshToken: refreshToken,
-		httpClient:   httpClient,
+		httpClient: httpClient,
 	}
+}
+
+func (a *ApiClient) SetApiClient(apiKey, refreshToken string) {
+	a.apiKey = apiKey
+	a.refreshToken = refreshToken
 }
 
 func (a *ApiClient) Refresh() (RefreshResponse, error) {

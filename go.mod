@@ -3,11 +3,12 @@ module github.com/gari8/fitman
 go 1.18
 
 require (
-	github.com/AlecAivazis/survey/v2 v2.3.4
-	github.com/BurntSushi/toml v1.0.0
-	github.com/jarcoal/httpmock v1.1.0
+	github.com/AlecAivazis/survey/v2 v2.3.7
+	github.com/BurntSushi/toml v1.3.2
+	github.com/jarcoal/httpmock v1.3.1
 	github.com/spf13/cobra v1.8.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.9.0
+	go.uber.org/mock v0.4.0
 )
 
 require (
@@ -19,8 +20,8 @@ require (
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
-	golang.org/x/term v0.0.0-20210503060354-a79de5458b56 // indirect
-	golang.org/x/text v0.3.3 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

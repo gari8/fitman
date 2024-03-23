@@ -14,7 +14,6 @@ func RunGet(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		profile = args[0]
 	}
-	fsClient := modules.NewFS()
 	conf, err := fsClient.ReadConfig()
 	if err != nil {
 		return err
@@ -22,7 +21,7 @@ func RunGet(cmd *cobra.Command, args []string) error {
 	if !conf.Contains(profile) {
 		return fmt.Errorf("invalid profile")
 	}
-	apiClient := modules.NewApiClient(conf[profile].ApiKey, conf[profile].RefreshToken, modules.NewHttpClient())
+	apiClient.SetApiClient(conf[profile].ApiKey, conf[profile].RefreshToken)
 	refreshToken, err := apiClient.Refresh()
 	if err != nil {
 		return err
@@ -48,12 +47,11 @@ func RunInit(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		profile = args[0]
 	}
-	fsClient := modules.NewFS()
 	resp, err := fsClient.Dialogue(true)
 	if err != nil {
 		return err
 	}
-	apiClient := modules.NewApiClient(resp.ApiKey, resp.RefreshToken, modules.NewHttpClient())
+	apiClient.SetApiClient(resp.ApiKey, resp.RefreshToken)
 
 	if _, err := apiClient.GetTokenInfo(); err != nil {
 		return err
@@ -92,7 +90,6 @@ func RunAdd(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		profile = args[0]
 	}
-	fsClient := modules.NewFS()
 	confResp, err := fsClient.ReadConfig()
 	if err != nil {
 		return err
@@ -104,7 +101,7 @@ func RunAdd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	apiClient := modules.NewApiClient(resp.ApiKey, resp.RefreshToken, modules.NewHttpClient())
+	apiClient.SetApiClient(resp.ApiKey, resp.RefreshToken)
 	if _, err := apiClient.GetTokenInfo(); err != nil {
 		return err
 	}
@@ -138,7 +135,6 @@ func RunAdd(cmd *cobra.Command, args []string) error {
 }
 
 func RunList(cmd *cobra.Command, args []string) error {
-	fsClient := modules.NewFS()
 	conf, err := fsClient.ReadConfig()
 	if err != nil {
 		return err
@@ -156,7 +152,6 @@ func RunDelete(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		profile = args[0]
 	}
-	fsClient := modules.NewFS()
 	conf, err := fsClient.ReadConfig()
 	if err != nil {
 		return err

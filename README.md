@@ -31,3 +31,8 @@ $ go install github.com/gari8/fitman@latest
 
 ### fitman help
 ### fitman --version
+
+# how to develop
+```bash
+go install go.uber.org/mock/mockgen
+```
