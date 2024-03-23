@@ -1,10 +1,10 @@
-package main
+package modules
 
 import (
 	"bytes"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
+	"io"
 	"testing"
 )
 
@@ -26,7 +26,7 @@ func TestHttpClient_post(t *testing.T) {
 	c := NewHttpClient()
 	b, err := c.post(testPath, nil, nil)
 	assert.NoError(t, err)
-	expected, err := ioutil.ReadAll(bytes.NewBuffer([]byte("OK")))
+	expected, err := io.ReadAll(bytes.NewBuffer([]byte("OK")))
 	assert.NoError(t, err)
 	assert.Equal(t, expected, b)
 }

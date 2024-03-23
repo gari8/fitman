@@ -50,3 +50,26 @@ fitman -v get
 }
 ```
 
+
+-------------------------------------------------
+
+new commands 
+
+fitman i, init
+-> create .fitman directory
+
+fitman a, add __field__
+-> add field to fitman's db
+-> override ok?
+
+fitman d, delete __field__
+-> delete field from fitman's db
+
+fitman ls, list
+-> show registered projects
+
+fitman g, get (__field__)
+-> get field's token
+
+fitman help
+fitman version
