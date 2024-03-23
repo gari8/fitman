@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	cliVersion = "1.0.0"
+	cliVersion = "v1.0.0"
 	onlyToken  = "only-token"
 )
 
