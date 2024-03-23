@@ -5,9 +5,11 @@ on:
     branches:
       - main
       - master
+    types:
+      - closed
+  push:
+    branches:
       - feat/#3_use_cobra
-#    types:
-#      - closed
 
 jobs:
   create-tag:
