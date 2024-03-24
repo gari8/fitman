@@ -12,40 +12,57 @@ $ go install github.com/gari8/fitman@latest
 ```
 
 # how to use
-
-https://user-images.githubusercontent.com/49360378/160030479-bfa92883-d0aa-4b7e-bb05-b58c630db754.mov
-
+## commands
+### fitman i, init [profile(optional)]
+initialize fitman with setting profile
+#### options
+- o, only-token
+  - Result contains only idToken
+```bash
+fitman init -o
 ```
-[sub commands]
-// create .fitman directory at your home-directory & get idToken
-fitman init
 
-// add new project `dev`
-fitman add dev
+### fitman a, add [profile(optional)]
+add profile to fitman's db
+#### options
+- o, only-token
+    - Result contains only idToken
+```bash
+fitman add user1 -o 
+```
 
-// show idToken (after init) 
-fitman get
+### fitman d, delete [profile(optional)]
+delete profile from fitman's db
+```bash
+fitman delete user1
+```
 
-// show help
+### fitman ls, list
+show registered profiles
+```bash
+fitman ls
+```
+
+### fitman g, get [profile(optional)]
+get profile's idToken
+#### options
+- o, only-token
+    - Result contains only idToken
+```bash
+fitman get user1 -o
+```
+
+### fitman help
+```bash
 fitman help
-
-// show projects
-fitman projects
-
-// show version
-fitman version
-
-[option]
-v: verbose
-fitman -v get
-{
-  "access_token": "dummy",
-  "expires_in": "3600",
-  "token_type": "Bearer",
-  "refresh_token": "dummy",
-  "id_token": "dummy",
-  "user_id": "dummy",
-  "project_id": "dummy"
-}
+```
+## version
+```bash
+fitman --version
+fitman -v
 ```
 
+# how to develop
+```bash
+go install go.uber.org/mock/mockgen
+```

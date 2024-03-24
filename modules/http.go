@@ -1,9 +1,8 @@
-package main
+package modules
 
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -32,5 +31,5 @@ func (c HttpClient) post(path string, value io.Reader, header map[string]string)
 	}
 
 	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }

@@ -1,8 +1,10 @@
+/*
+Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+*/
 package main
 
+import "github.com/gari8/fitman/cmd"
+
 func main() {
-	c := NewHttpClient()
-	h := NewIoHandler()
-	cfg := NewConfig(c, h)
-	cfg.setup()
+	cmd.Execute()
 }
