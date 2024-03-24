@@ -5,10 +5,10 @@ go 1.18
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/BurntSushi/toml v1.3.2
+	github.com/golang/mock v1.6.0
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
-	go.uber.org/mock v0.4.0
 )
 
 require (
